@@ -1,0 +1,80 @@
+##
+## EPITECH PROJECT, 2019
+## Rattrapage
+## File description:
+## automakefile
+##
+
+#!/bin/sh
+
+if [ -z $1 ];
+then
+    exit 84
+fi
+if [ ! -f $1 ];
+then
+    exit 84
+fi
+if [ ! -r $1 ];
+then
+    exit 84
+fi
+if [ ! -s $1 ];
+then
+    exit 84
+fi
+folder=$(echo $1 | grep -o '.*\/')
+if [ -z $folder ];
+then
+    finalfolder="./"
+else
+    finalfolder=$folder
+fi
+makefile="Makefile"
+makeline=$folder$makefile
+touch $makeline
+while read line; do
+    str=${line%%;*}
+    if [[ $str =~ ".c" ]]
+    then
+        src=$src" "$str
+    fi
+    str2=${line%%;*}
+    if [[ $str2 =~ EXEC ]]
+    then
+        name=${line#*;}
+    fi
+    if [[ $str2 =~ CFLAGS ]]
+    then
+        flags=${line#*;}
+    fi
+    if [[ $str2 =~ LDFLAGS ]]
+    then
+        ldflags=${line#*;}
+    fi
+done < $1
+
+echo "SRC	=	"$src > $makeline
+echo "" >> $makeline
+echo -e "OBJ	=	\$(SRC:.c=.o)" >> $makeline
+echo "" >> $makeline
+echo "NAME	=	"$name >> $makeline
+echo "" >> $makeline
+echo "RM	=	rm -rf" >> $makeline
+echo "" >> $makeline
+echo "CFLAGS	=	"$flags >> $makeline
+echo "" >> $makeline
+echo "LDFLAGS +="$ldflags >> $makeline
+echo "" >> $makeline
+echo -e "all:	\$(NAME)" >> $makeline
+echo "" >> $makeline
+echo -e "\$(NAME):	\$(OBJ)" >> $makeline
+echo -e "\\tgcc \$(OBJ) -o \$(NAME) \$(CFLAGS)" >> $makeline
+echo "" >> $makeline
+echo "clean:" >> $makeline
+echo -e "\\trm -f \$(OBJ)" >> $makeline
+echo "" >> $makeline
+echo -e "fclean: clean" >> $makeline
+echo -e "\\trm -f \$(NAME)" >> $makeline
+echo "" >> $makeline
+echo "re: fclean all" >> $makeline
